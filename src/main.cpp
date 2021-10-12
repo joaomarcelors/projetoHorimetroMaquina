@@ -7,8 +7,8 @@
 #include <FS_File_Record.h> // Nossa lib personalizada do SPIFFS
 #include <esp_task_wdt.h>
 
-#define SSID "nome_da_rede"
-#define PASSWORD "senha_da_rede"
+#define SSID "trem"
+#define PASSWORD "ze127naide"
 #define led 17
 #define botao 16
 #define host_google "www.google.com"
