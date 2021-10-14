@@ -12,6 +12,7 @@ void configurar(){
     pinMode(botaoStartStop.pin_led, OUTPUT);
     botaoStartStop.estado_atual = digitalRead(botaoStartStop.pin_botao);
     botaoStartStop.ultimo_estado = botaoStartStop.estado_atual;
+    botaoStartStop.parado = false;
 
     //Botao SETUP
     botaoSetup.pin_botao = 4;
@@ -20,6 +21,7 @@ void configurar(){
     pinMode(botaoSetup.pin_led, OUTPUT);
     botaoSetup.estado_atual = digitalRead(botaoSetup.pin_botao);
     botaoSetup.ultimo_estado = botaoSetup.estado_atual;
+    botaoStartStop.parado = false;
 
     //Botao Manuteção
     botaoManutecao.pin_botao = 16;
@@ -28,4 +30,5 @@ void configurar(){
     pinMode(botaoManutecao.pin_led, OUTPUT);
     botaoManutecao.estado_atual = digitalRead(botaoManutecao.pin_botao);
     botaoManutecao.ultimo_estado = botaoManutecao.estado_atual;
+    botaoStartStop.parado = false;
 }
