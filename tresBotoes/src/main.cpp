@@ -92,4 +92,39 @@ void loop() {
     delay(75);
   }  
 
+  //Botao MANUTENÇÂO
+  botaoManutecao.estado_atual = !digitalRead(botaoManutecao.pin_botao);
+  
+  if(botaoManutecao.estado_atual != botaoManutecao.ultimo_estado){  
+    botaoManutecao.ultimo_estado = botaoManutecao.estado_atual;
+    if(botaoManutecao.estado_atual == HIGH){
+      if(!botaoManutecao.parado){
+        Serial.println("=========================================");
+        Serial.println("MAQUINA PARADA!");
+        Serial.println("TIPO: MANUTENÇÂO");
+        botaoManutecao.parado = true;
+        digitalWrite(botaoManutecao.pin_led, HIGH);
+       /* data_inicio_parada = getData();
+        hora_inicio_parada = getHora();
+        Serial.println("Data: " + data_inicio_parada);
+        Serial.println("Hora: " + hora_inicio_parada);*/
+        Serial.println("=========================================");       
+      }else{
+        Serial.println("=========================================");
+        Serial.println("MAQUINA RETORMADA!");
+        //Serial.println("RELATORIO:");
+        botaoManutecao.parado = false;
+        digitalWrite(botaoManutecao.pin_led, LOW);
+       /* data_fim_parada = getData();
+        hora_fim_parada = getHora();
+        Serial.println("Data inicio: " + data_inicio_parada);
+        Serial.println("Hora inicio: " + hora_inicio_parada);      
+        Serial.println("Data fim:   " + data_fim_parada);
+        Serial.println("Hora fim:   " + hora_fim_parada);*/
+        Serial.println("=========================================");
+      }
+    }
+    delay(75);
+  }    
+
 }
