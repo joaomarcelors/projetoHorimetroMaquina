@@ -5,7 +5,6 @@
 #include <HTTPClient.h>
 #include <NTPClient.h>
 #include <FS_File_Record.h> // Nossa lib personalizada do SPIFFS
-//#include <esp_task_wdt.h>
 
 #define SSID "trem"
 #define PASSWORD "ze127naide"
