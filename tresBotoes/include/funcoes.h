@@ -19,4 +19,6 @@ extern Botao botaoSetup;
 extern Botao botaoManutecao;
 
 void configurar();
+void verificaBotao(Botao *botao, String tipo);
+
 #endif 
