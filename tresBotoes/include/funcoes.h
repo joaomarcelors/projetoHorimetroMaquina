@@ -14,8 +14,9 @@ typedef struct{
     bool ultimo_estado;
     bool parado;
 }Botao;
-//botoes 4, 15, 16 
-//led 17, 5, 18
-extern Botao botaoStopSart;
+extern Botao botaoStartStop;
+extern Botao botaoSetup;
+extern Botao botaoManutecao;
 
+void configurar();
 #endif 
