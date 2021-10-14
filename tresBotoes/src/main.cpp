@@ -42,7 +42,7 @@ void loop() {
       }else{
         Serial.println("=========================================");
         Serial.println("MAQUINA RETORMADA!");
-        Serial.println("RELATORIO:");
+        //Serial.println("RELATORIO:");
         botaoStartStop.parado = false;
         digitalWrite(botaoStartStop.pin_led, LOW);
        /* data_fim_parada = getData();
@@ -56,5 +56,40 @@ void loop() {
     }
     delay(75);
   }    
+
+  //Botao SETUP
+  botaoSetup.estado_atual = !digitalRead(botaoSetup.pin_botao);
+  
+  if(botaoSetup.estado_atual != botaoSetup.ultimo_estado){  
+    botaoSetup.ultimo_estado = botaoSetup.estado_atual;
+    if(botaoSetup.estado_atual == HIGH){
+      if(!botaoSetup.parado){
+        Serial.println("=========================================");
+        Serial.println("MAQUINA PARADA!");
+        Serial.println("TIPO: SETUP");
+        botaoSetup.parado = true;
+        digitalWrite(botaoSetup.pin_led, HIGH);
+       /* data_inicio_parada = getData();
+        hora_inicio_parada = getHora();
+        Serial.println("Data: " + data_inicio_parada);
+        Serial.println("Hora: " + hora_inicio_parada);*/
+        Serial.println("=========================================");       
+      }else{
+        Serial.println("=========================================");
+        Serial.println("MAQUINA RETORMADA!");
+        //Serial.println("RELATORIO:");
+        botaoSetup.parado = false;
+        digitalWrite(botaoSetup.pin_led, LOW);
+       /* data_fim_parada = getData();
+        hora_fim_parada = getHora();
+        Serial.println("Data inicio: " + data_inicio_parada);
+        Serial.println("Hora inicio: " + hora_inicio_parada);      
+        Serial.println("Data fim:   " + data_fim_parada);
+        Serial.println("Hora fim:   " + hora_fim_parada);*/
+        Serial.println("=========================================");
+      }
+    }
+    delay(75);
+  }  
 
 }
