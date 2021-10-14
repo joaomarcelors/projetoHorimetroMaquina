@@ -1,12 +1,12 @@
-#include <Arduino.h>
 #include <funcoes.h>
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.println("Inciando...");
+  serverName = "http://" + serverLocal.toString() + ":" + String(http_port)+ "/maquina/insert_maquina.php";
 
-  configurar();
+  configureButtons();
 
   for(int i=0; i<5; i++){
     digitalWrite(botaoStartStop.pin_led, HIGH);
@@ -18,12 +18,127 @@ void setup() {
     digitalWrite(botaoManutecao.pin_led, LOW);
     delay(100);
   }
+
+  xTaskCreatePinnedToCore(
+        checkWiFiConnection,
+        "checkWiFiConnection",
+        10000,
+        NULL,
+        2,
+        NULL,
+        0);
+
+  delay(500);
+
+  xTaskCreatePinnedToCore(
+        checkInternet,
+        "checkInternet",
+        10000,
+        NULL,
+        2,
+        NULL,
+        0);
+
+  delay(500);
+
+ /* xTaskCreatePinnedToCore(
+        adicionaDadosFila,
+        "adicionaDadosFila",
+        10000,
+        NULL,
+        3,
+        NULL,
+        0);
+
+  delay(500);*/
+
+  disableCore0WDT();
+  configureWatchDog();
+  connectWiFi();
+  initSPPIFS();
+  initNTP();
+  
+  Serial.println("Data: " + getData() + " Hora: " + getHora());
 }
 
 void loop() {
- 
-  verificaBotao(&botaoStartStop, "START/STOP ");
-  verificaBotao(&botaoSetup, "SETUP");
-  verificaBotao(&botaoManutecao, "MANUTENÇÃO");
-  
+  timerWrite(timer, 0);
+
+  verificaBotao(&botaoStartStop, STARTSTOP);
+  verificaBotao(&botaoSetup, SETUP);
+  verificaBotao(&botaoManutecao, MANUTENCAO);
 }
+
+/*void adicionaDadosFila(void *p)
+{
+  TickType_t taskDelay = 2000 / portTICK_PERIOD_MS;
+  while (true){
+    if(WiFi.status() == WL_CONNECTED && temDados){
+      if (isConnectedServer()){
+        if (!solicitouAcesso){
+          liberado = false;
+          //strcpy(dados_txt, "");
+          Serial.println("task usando o SPPIFS");
+          Serial.println("Enviando dados para o banco de dados");
+          linha = "";
+          errorMsg = "0";
+          ObjFS.rewind();
+          // Exibe todos os registros até o fim
+          while (ObjFS.readFileNextRecord(&linha, &errorMsg) && linha != ""){
+            Serial.println(linha);
+            enviouTudo = enviaDadosPOST(linha.substring(0, 10), linha.substring(11, 19), linha.substring(20, 30), linha.substring(31, 39));
+            if(!enviouTudo)
+              break;
+          }
+          if(enviouTudo){
+            Serial.println("Todos os dados foram enviados!");
+            if (ObjFS.destroyFile()){
+              Serial.println("Arquivo Apagado");
+            }
+            else
+              Serial.println("Falha ao apagar arquivo!");
+            temDados = false;
+          }else{
+            temDados = true;
+          }
+          
+          liberado = true;
+        }
+        else{
+          Serial.println("Solicitaram acesso!");
+        }
+      }
+      else{
+        Serial.println("Dados na fila:");
+        showAllFiles();
+      }
+    }
+    vTaskDelay(taskDelay);
+  }
+}*/
+
+void checkInternet(void *p)
+{
+  TickType_t taskDelay = 5000 / portTICK_PERIOD_MS;
+
+  while (true){
+    if (hasInternet()){
+      lastTimeConnected = millis();
+    }
+
+    vTaskDelay(taskDelay);
+  }
+}
+
+void checkWiFiConnection(void *p){
+
+  TickType_t taskDelay = 1000 / portTICK_PERIOD_MS;
+
+  while (true){
+    if (WiFi.status() != WL_CONNECTED){
+      connectWiFi();
+    }
+    vTaskDelay(taskDelay);
+  }
+}
+
