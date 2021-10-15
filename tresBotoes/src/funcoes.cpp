@@ -36,7 +36,7 @@ IPAddress serverLocal(10, 0, 0, 109);
 void configureButtons(){
     //Botao START/STOP
     botaoStartStop.pin_botao = 15;
-    botaoStartStop.pin_led = 17;
+    botaoStartStop.pin_led = 25;
     botaoStartStop.id = 1;
     pinMode(botaoStartStop.pin_botao, INPUT);
     pinMode(botaoStartStop.pin_led, OUTPUT);
@@ -49,7 +49,7 @@ void configureButtons(){
 
     //Botao SETUP
     botaoSetup.pin_botao = 4;
-    botaoSetup.pin_led = 18;
+    botaoSetup.pin_led = 33;
     botaoSetup.id = 2;
     pinMode(botaoSetup.pin_botao, INPUT);
     pinMode(botaoSetup.pin_led, OUTPUT);
@@ -62,7 +62,7 @@ void configureButtons(){
 
     //Botao Manuteção
     botaoManutecao.pin_botao = 16;
-    botaoManutecao.pin_led = 19;
+    botaoManutecao.pin_led = 32;
     botaoManutecao.id = 3;
     pinMode(botaoManutecao.pin_botao, INPUT);
     pinMode(botaoManutecao.pin_led, OUTPUT);
