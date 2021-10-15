@@ -7,6 +7,7 @@
 #include <HTTPClient.h>
 #include <NTPClient.h>
 #include <FS_File_Record.h>
+#include "nvs_flash.h" 
 
 #define SSID "trem"
 #define PASSWORD "ze127naide"
@@ -68,11 +69,13 @@ void connectWiFi();
 bool enviaDadosPOST(String di, String hi, String df, String hf, int id);
 String getData();
 String getHora();
+bool gravaPosNVS(String chave, uint32_t dado);
 bool hasInternet();
 bool isDisconnectedForTooLong();
 bool isConnectedServer();
 void initNTP();
 void initSPPIFS();
+uint32_t lerPosNVS(String chave);
 void showAllFiles();
 void soft_RESET();
 bool solicitaramAcesso();

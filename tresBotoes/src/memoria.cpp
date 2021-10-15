@@ -1,5 +1,34 @@
 #include <funcoes.h>
 
+bool gravaPosNVS(String chave, uint32_t dado)
+{
+    // Acessar a partiçao
+    nvs_handle handler_particao_nvs;
+    esp_err_t err;
+    err = nvs_flash_init_partition("nvs");
+    if (err != ESP_OK){
+        Serial.println("[ERRO] Falha ao iniciar partição NVS.");           
+        return false;
+    }
+    err = nvs_open_from_partition("nvs", "ns_nvs", NVS_READWRITE, &handler_particao_nvs);
+    if (err != ESP_OK){
+        Serial.println("[ERRO] Falha ao abrir NVS como escrita/leitura"); 
+        return false;
+    }
+    /* Atualiza valor do horimetro total */
+    err = nvs_set_u32(handler_particao_nvs, chave.c_str(), dado);
+    if (err != ESP_OK){
+        Serial.println("[ERRO] Erro ao gravar horimetro");                   
+        nvs_close(handler_particao_nvs);
+        return false;
+    }else{
+        Serial.println("Posição gravada com sucesso!");     
+        nvs_commit(handler_particao_nvs);    
+        nvs_close(handler_particao_nvs);  
+        return true;    
+    }
+}
+
 void initSPPIFS(){
   num_fails = 1;
   while (!ObjFS.init()){
@@ -19,6 +48,32 @@ void initSPPIFS(){
   }else{
     Serial.println("Abrindo aquivo existente...");
   }
+}
+
+uint32_t lerPosNVS(String chave){
+    nvs_handle handler_particao_nvs;
+    esp_err_t err;
+    uint32_t dado_lido;
+    err = nvs_flash_init_partition("nvs");
+    if (err != ESP_OK){
+        Serial.println("[ERRO] Falha ao iniciar partição NVS.");         
+        return 0;
+    }
+    err = nvs_open_from_partition("nvs", "ns_nvs", NVS_READWRITE, &handler_particao_nvs);
+    if (err != ESP_OK){
+        Serial.println("[ERRO] Falha ao abrir NVS como escrita/leitura");         
+        return 0;
+    }
+    /* Faz a leitura do dado associado a chave definida em CHAVE_NVS */
+    err = nvs_get_u32(handler_particao_nvs, chave.c_str(), &dado_lido);
+    if (err != ESP_OK){
+        Serial.println("[ERRO] Falha ao fazer leitura do dado");         
+        return 0;
+    }else{
+        Serial.println("Posição lida com sucesso!");  
+        nvs_close(handler_particao_nvs);   
+        return dado_lido;
+    }
 }
 
 void showAllFiles(){
