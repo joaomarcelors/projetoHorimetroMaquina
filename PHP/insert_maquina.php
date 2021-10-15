@@ -4,13 +4,13 @@
     if(!password_verify($_POST['key'], $hash))
         die("Chave inválida.");
 
-    $data_inicio_parada = $_POST['data_inicio_parada'];
-    $hora_inicio_parada  = $_POST['hora_inicio_parada'];
-    $data_fim_parada = $_POST['data_fim_parada'];
-    $hora_fim_parada = $_POST['hora_fim_parada'];
+    $data_inicio = $_POST['data_inicio'];
+    $hora_incio  = $_POST['hora_inicio'];
+    $data_fim = $_POST['data_fim'];
+    $hora_fim = $_POST['hora_fim'];
     $tipo = $_POST['tipo'];
     
-    if (is_null($data_inicio_parada) || is_null($hora_inicio_parada) || is_null($data_fim_parada) || is_null($hora_fim_parada) || is_null($tipo)){
+    if (is_null($data_inicio) || is_null($hora_incio) || is_null($data_fim) || is_null($hora_fim) || is_null($tipo)){
         die("Dados recebidos inválidos");
     }
 
@@ -26,8 +26,8 @@
        // echo "Conectado ao bando de dados<br/>";
    // } 
     
-    $sql = "INSERT INTO industria.$tabela (data_inicio_parada, hora_inicio_parada, data_fim_parada, hora_fim_parada, tipo_parada) 
-            VALUES ('$data_inicio_parada', '$hora_inicio_parada', '$data_fim_parada', '$hora_fim_parada', '$tipo')";
+    $sql = "INSERT INTO industria.$tabela (data_inicio, hora_inicio, data_fim, hora_fim, tipo) 
+            VALUES ('$data_inicio', '$hora_incio', '$data_fim', '$hora_fim', '$tipo')";
 
     //echo "$sql<br/>";
     if (!$conn->query($sql)) {

@@ -65,7 +65,7 @@ void checkWiFiConnection(void *p);
 void configureButtons();
 void configureWatchDog();
 void connectWiFi();
-bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id);
+bool enviaDadosPOST(String di, String hi, String df, String hf, int id);
 String getData();
 String getHora();
 bool hasInternet();

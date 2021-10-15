@@ -98,7 +98,7 @@ void connectWiFi(){
   Serial.println(WiFi.localIP());
 }
 
-bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id){
+bool enviaDadosPOST(String di, String hi, String df, String hf, int id){
   String tipo;
   if (!isConnectedServer())
     return false;
@@ -112,18 +112,19 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id){
 
   Serial.println("####################################################################");
   Serial.println("Dados a ser enviado: ");
-  Serial.println("Data inicio: " + dip);
-  Serial.println("Hora inicio: " + hip);
-  Serial.println("Data fim:   " + dfp);
-  Serial.println("Hora fim:   " + hfp);
+  Serial.println("Data inicio: " + di);
+  Serial.println("Hora inicio: " + hi);
+  Serial.println("Data fim:   " + df);
+  Serial.println("Hora fim:   " + hf);
   Serial.println("TIPO: " + tipo);
   Serial.println("####################################################################");
 
   //Serial.println(serverName);
   http.begin(client, serverName);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded"); 
-  httpRequestData = "key=" + key + "&data_inicio=" + dip + "&hora_inicio=" + hip +
-          "&data_fim=" + dfp + "&hora_fim=" + hfp + "&tipo=" + tipo;
+  httpRequestData = "key=" + key + "&data_inicio=" + di
+   + "&hora_inicio=" + hi +
+          "&data_fim=" + df + "&hora_fim=" + hf + "&tipo=" + tipo;
   httpResponseCode = http.POST(httpRequestData);
 
   Serial.print("HTTP Response code: ");
