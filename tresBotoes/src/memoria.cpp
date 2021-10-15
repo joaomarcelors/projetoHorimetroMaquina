@@ -1,7 +1,6 @@
 #include <funcoes.h>
 
-bool gravaPosNVS(String chave, uint32_t dado)
-{
+bool gravaPosNVS(String chave, String dado){
     // Acessar a partiçao
     nvs_handle handler_particao_nvs;
     esp_err_t err;
@@ -15,8 +14,8 @@ bool gravaPosNVS(String chave, uint32_t dado)
         Serial.println("[ERRO] Falha ao abrir NVS como escrita/leitura"); 
         return false;
     }
-    /* Atualiza valor do horimetro total */
-    err = nvs_set_u32(handler_particao_nvs, chave.c_str(), dado);
+    // Atualiza valor do horimetro total 
+    err = nvs_set_str(handler_particao_nvs, chave.c_str(), dado.c_str());
     if (err != ESP_OK){
         Serial.println("[ERRO] Erro ao gravar horimetro");                   
         nvs_close(handler_particao_nvs);
@@ -50,25 +49,30 @@ void initSPPIFS(){
   }
 }
 
-uint32_t lerPosNVS(String chave){
+String lerPosNVS(String chave){
     nvs_handle handler_particao_nvs;
     esp_err_t err;
-    uint32_t dado_lido;
+    size_t required_size;
+    char dado_lido[12];
     err = nvs_flash_init_partition("nvs");
     if (err != ESP_OK){
         Serial.println("[ERRO] Falha ao iniciar partição NVS.");         
-        return 0;
+        return "";
     }
     err = nvs_open_from_partition("nvs", "ns_nvs", NVS_READWRITE, &handler_particao_nvs);
     if (err != ESP_OK){
         Serial.println("[ERRO] Falha ao abrir NVS como escrita/leitura");         
-        return 0;
+        return "";
     }
-    /* Faz a leitura do dado associado a chave definida em CHAVE_NVS */
-    err = nvs_get_u32(handler_particao_nvs, chave.c_str(), &dado_lido);
+    // Faz a leitura do dado associado a chave definida em CHAVE_NVS 
+    //err = nvs_get_u32(handler_particao_nvs, chave.c_str(), &dado_lido);
+    nvs_get_str(handler_particao_nvs, chave.c_str(), NULL, &required_size);//obtem o tamamnho da string
+
+    // = malloc(required_size);
+    err = nvs_get_str(handler_particao_nvs, chave.c_str(), dado_lido, &required_size);
     if (err != ESP_OK){
         Serial.println("[ERRO] Falha ao fazer leitura do dado");         
-        return 0;
+        return "";
     }else{
         Serial.println("Posição lida com sucesso!");  
         nvs_close(handler_particao_nvs);   
