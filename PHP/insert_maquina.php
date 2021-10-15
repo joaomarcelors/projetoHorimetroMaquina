@@ -16,7 +16,7 @@
 
     $servername = "localhost";
     $username = "root";
-    $password = "570137122";
+    $password = "";
     $dbname = "industria";
     $tabela = "maquina1";
     $conn = new mysqli($servername, $username, $password, $dbname);
