@@ -65,11 +65,9 @@ String lerPosNVS(String chave){
         return "";
     }
     // Faz a leitura do dado associado a chave definida em CHAVE_NVS 
-    //err = nvs_get_u32(handler_particao_nvs, chave.c_str(), &dado_lido);
     nvs_get_str(handler_particao_nvs, chave.c_str(), NULL, &required_size);//obtem o tamamnho da string
-
-    // = malloc(required_size);
     err = nvs_get_str(handler_particao_nvs, chave.c_str(), dado_lido, &required_size);
+
     if (err != ESP_OK){
         Serial.println("[ERRO] Falha ao fazer leitura do dado");         
         return "";
@@ -105,4 +103,29 @@ void showAllFiles(){
 
   // Exibe na serial e no display o fim do arquivo
   Serial.println("# End of file #");
+}
+
+void verificaDadosNVS(Botao *botao){
+  String str;
+  Serial.println("==============================");
+  Serial.println("BOTAO " + botao->tipo);
+  str = lerPosNVS(botao->chave_di_nvs);
+  if(str.equals("")){ //senao conseguir retorna ""
+    botao->data_inicio = "";
+    gravaPosNVS(botao->chave_di_nvs, "");
+    Serial.println("Data inicio: vazio");
+  }else{
+    botao->data_inicio = str;
+    Serial.println("Data inicio: " + botao->data_inicio);
+  }
+  str = lerPosNVS(botao->chave_hi_nvs);
+  if(str.equals("")){ //senao conseguir retorna ""
+    botao->hora_inicio = "";
+    gravaPosNVS(botao->chave_hi_nvs, "");
+    Serial.println("Hora inicio: vazio");
+  }else{
+    botao->hora_inicio = str;
+    Serial.println("Hora inicio: " + botao->hora_inicio);
+  }
+  Serial.println("==============================");
 }

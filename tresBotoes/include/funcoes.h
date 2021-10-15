@@ -83,5 +83,6 @@ void soft_RESET();
 bool solicitaramAcesso();
 bool possuemDados();
 void verificaBotao(Botao *botao);
+void verificaDadosNVS(Botao *botao);
 
 #endif 

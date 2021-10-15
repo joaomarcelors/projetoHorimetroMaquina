@@ -13,6 +13,8 @@ void configureButtons(){
     botaoStartStop.solicitouAcesso = false;
     botaoStartStop.possuiDados = false;
     botaoStartStop.tipo = "START/STOP";
+    botaoStartStop.chave_di_nvs = "bss_di";
+    botaoStartStop.chave_hi_nvs = "bss_hi";
 
     //Botao SETUP
     botaoSetup.pin_botao = 4;
@@ -26,6 +28,8 @@ void configureButtons(){
     botaoSetup.solicitouAcesso = false;
     botaoSetup.possuiDados = false;
     botaoSetup.tipo = "SETUP";
+    botaoSetup.chave_di_nvs = "bsetup_di";
+    botaoSetup.chave_hi_nvs = "bsetup_hi";
 
     //Botao Manuteção
     botaoManutecao.pin_botao = 16;
@@ -39,6 +43,8 @@ void configureButtons(){
     botaoManutecao.solicitouAcesso = false;
     botaoManutecao.possuiDados = false;
     botaoManutecao.tipo = "MANUTENCAO";
+    botaoManutecao.chave_di_nvs = "bmntc_di";
+    botaoManutecao.chave_hi_nvs = "bmntc_hi";
 }
 
 bool solicitaramAcesso(){
