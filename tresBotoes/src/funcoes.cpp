@@ -43,10 +43,10 @@ void configureButtons(){
     pinMode(botaoStartStop.pin_led, OUTPUT);
     botaoStartStop.estado_atual = digitalRead(botaoStartStop.pin_botao);
     botaoStartStop.ultimo_estado = botaoStartStop.estado_atual;
-    botaoStartStop.parado = false;
+    botaoStartStop.ativado = false;
     botaoStartStop.solicitouAcesso = false;
     botaoStartStop.possuiDados = false;
-    botaoStartStop.tipo_parada = "START/STOP";
+    botaoStartStop.tipo = "START/STOP";
 
     //Botao SETUP
     botaoSetup.pin_botao = 4;
@@ -56,10 +56,10 @@ void configureButtons(){
     pinMode(botaoSetup.pin_led, OUTPUT);
     botaoSetup.estado_atual = digitalRead(botaoSetup.pin_botao);
     botaoSetup.ultimo_estado = botaoSetup.estado_atual;
-    botaoSetup.parado = false;
+    botaoSetup.ativado = false;
     botaoSetup.solicitouAcesso = false;
     botaoSetup.possuiDados = false;
-    botaoSetup.tipo_parada = "SETUP";
+    botaoSetup.tipo = "SETUP";
 
     //Botao Manuteção
     botaoManutecao.pin_botao = 16;
@@ -69,10 +69,10 @@ void configureButtons(){
     pinMode(botaoManutecao.pin_led, OUTPUT);
     botaoManutecao.estado_atual = digitalRead(botaoManutecao.pin_botao);
     botaoManutecao.ultimo_estado = botaoManutecao.estado_atual;
-    botaoManutecao.parado = false;
+    botaoManutecao.ativado = false;
     botaoManutecao.solicitouAcesso = false;
     botaoManutecao.possuiDados = false;
-    botaoManutecao.tipo_parada = "MANUTENCAO";
+    botaoManutecao.tipo = "MANUTENCAO";
 }
 
 void configureWatchDog(){
@@ -104,11 +104,11 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id){
     return false;
 
   if(id == 1)
-    tipo = botaoStartStop.tipo_parada;
+    tipo = botaoStartStop.tipo;
   else if(id == 2)
-    tipo = botaoSetup.tipo_parada;
+    tipo = botaoSetup.tipo;
   else if(id == 3)
-    tipo = botaoManutecao.tipo_parada;
+    tipo = botaoManutecao.tipo;
 
   Serial.println("####################################################################");
   Serial.println("Dados a ser enviado: ");
@@ -122,8 +122,8 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id){
   //Serial.println(serverName);
   http.begin(client, serverName);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded"); 
-  httpRequestData = "key=" + key + "&data_inicio_parada=" + dip + "&hora_inicio_parada=" + hip +
-          "&data_fim_parada=" + dfp + "&hora_fim_parada=" + hfp + "&tipo=" + tipo;
+  httpRequestData = "key=" + key + "&data_inicio=" + dip + "&hora_inicio=" + hip +
+          "&data_fim=" + dfp + "&hora_fim=" + hfp + "&tipo=" + tipo;
   httpResponseCode = http.POST(httpRequestData);
 
   Serial.print("HTTP Response code: ");
@@ -285,19 +285,19 @@ void verificaBotao(Botao *botao){
   if(botao->estado_atual != botao->ultimo_estado){  
     botao->ultimo_estado = botao->estado_atual;
     if(botao->estado_atual == HIGH){
-      if(!botao->parado){
+      if(!botao->ativado){
         Serial.println("=========================================");
         if(botao->id == 1) //operador da maquina
           Serial.println("OPERADOR COMEÇOU A USAR A MÁQUINA!");
         else
           Serial.println("MAQUINA PARADA!");
-        botao->parado = true;
+        botao->ativado = true;
         digitalWrite(botao->pin_led, HIGH);
-        botao->data_inicio_parada = getData();
-        botao->hora_inicio_parada = getHora();
-        Serial.println("TIPO: " + botao->tipo_parada);
-        Serial.println("Data: " + botao->data_inicio_parada);
-        Serial.println("Hora: " + botao->hora_inicio_parada);
+        botao->data_inicio = getData();
+        botao->hora_inicio = getHora();
+        Serial.println("TIPO: " + botao->tipo);
+        Serial.println("Data: " + botao->data_inicio);
+        Serial.println("Hora: " + botao->hora_inicio);
         Serial.println("=========================================");       
       }else{
         Serial.println("=========================================");
@@ -305,18 +305,18 @@ void verificaBotao(Botao *botao){
           Serial.println("OPERADOR TERMINOU DE USAR A MÁQUINA!");
         else
           Serial.println("MAQUINA RETORMADA!");
-        botao->parado = false;
+        botao->ativado = false;
         digitalWrite(botao->pin_led, LOW);
-        botao->data_fim_parada = getData();
-        botao->hora_fim_parada = getHora();
-        Serial.println("TIPO: " + botao->tipo_parada);
+        botao->data_fim = getData();
+        botao->hora_fim = getHora();
+        Serial.println("TIPO: " + botao->tipo);
         Serial.println("RELATORIO:");
-        Serial.println("Data inicio: " + botao->data_inicio_parada);
-        Serial.println("Hora inicio: " + botao->hora_inicio_parada);      
-        Serial.println("Data fim:   " + botao->data_fim_parada);
-        Serial.println("Hora fim:   " + botao->hora_fim_parada);
+        Serial.println("Data inicio: " + botao->data_inicio);
+        Serial.println("Hora inicio: " + botao->hora_inicio);      
+        Serial.println("Data fim:   " + botao->data_fim);
+        Serial.println("Hora fim:   " + botao->hora_fim);
         Serial.println("=========================================");
-        dados = botao->data_inicio_parada + "," + botao->hora_inicio_parada + "," + botao->data_fim_parada + "," + botao->hora_fim_parada + "," + String(botao->id);
+        dados = botao->data_inicio + "," + botao->hora_inicio + "," + botao->data_fim + "," + botao->hora_fim + "," + String(botao->id);
         Serial.println("Dados a serem gravados: " + dados);
         botao->solicitouAcesso = true;
         Serial.print("Aguardando");
