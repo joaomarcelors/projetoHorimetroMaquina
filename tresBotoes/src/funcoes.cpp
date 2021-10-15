@@ -7,9 +7,10 @@ String httpRequestData;
 String serverName;
 String serverPath;
 String payload;
-bool enviouTudo;
+bool enviou;
 bool liberado = true;
 uint32_t lastTimeConnected = 0;
+int posicao = 0; //pode ser usado la na frente
 int httpResponseCode;
 int num_fails;
 //2021-09-29;17:10:58;2021-09-29;17:11:01;0
@@ -286,25 +287,30 @@ void verificaBotao(Botao *botao){
     if(botao->estado_atual == HIGH){
       if(!botao->parado){
         Serial.println("=========================================");
-        Serial.println("MAQUINA PARADA!");
-        botao->parado = true;
-        Serial.println("TIPO: " + botao->tipo_parada);
+        if(botao->id == 1) //operador da maquina
+          Serial.println("OPERADOR COMEÇOU A USAR A MÁQUINA!");
+        else
+          Serial.println("MAQUINA PARADA!");
         botao->parado = true;
         digitalWrite(botao->pin_led, HIGH);
         botao->data_inicio_parada = getData();
         botao->hora_inicio_parada = getHora();
+        Serial.println("TIPO: " + botao->tipo_parada);
         Serial.println("Data: " + botao->data_inicio_parada);
         Serial.println("Hora: " + botao->hora_inicio_parada);
         Serial.println("=========================================");       
       }else{
         Serial.println("=========================================");
-        Serial.println("MAQUINA RETORMADA!");
-        Serial.println("TIPO: " + botao->tipo_parada);
-        Serial.println("RELATORIO:");
+        if(botao->id == 1)
+          Serial.println("OPERADOR TERMINOU DE USAR A MÁQUINA!");
+        else
+          Serial.println("MAQUINA RETORMADA!");
         botao->parado = false;
         digitalWrite(botao->pin_led, LOW);
         botao->data_fim_parada = getData();
         botao->hora_fim_parada = getHora();
+        Serial.println("TIPO: " + botao->tipo_parada);
+        Serial.println("RELATORIO:");
         Serial.println("Data inicio: " + botao->data_inicio_parada);
         Serial.println("Hora inicio: " + botao->hora_inicio_parada);      
         Serial.println("Data fim:   " + botao->data_fim_parada);

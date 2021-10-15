@@ -84,12 +84,16 @@ void adicionaDadosFila(void *p)
           ObjFS.rewind();
           // Exibe todos os registros até o fim
           while (ObjFS.readFileNextRecord(&linha, &errorMsg) && linha != ""){
-            Serial.println(linha);
-            enviouTudo = enviaDadosPOST(linha.substring(0, 10), linha.substring(11, 19), linha.substring(20, 30), linha.substring(31, 39), linha.substring(40, 41).toInt());
-            if(!enviouTudo)
+          Serial.println(linha);
+          enviou = enviaDadosPOST(linha.substring(0, 10), linha.substring(11, 19), linha.substring(20, 30), linha.substring(31, 39), linha.substring(40, 41).toInt());
+          
+            if(enviou){
+              posicao++;
+            }else{
               break;
+            }
           }
-          if(enviouTudo){
+          if(enviou){
             Serial.println("Todos os dados foram enviados!");
             if (ObjFS.destroyFile()){
               Serial.println("Arquivo Apagado");
@@ -109,8 +113,7 @@ void adicionaDadosFila(void *p)
         else{
           Serial.println("Solicitaram acesso!");
         }
-      }
-      else{
+      }else{
         Serial.println("Dados na fila:");
         showAllFiles();
       }
