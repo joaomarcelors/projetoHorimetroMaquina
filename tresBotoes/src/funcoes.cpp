@@ -1,13 +1,14 @@
 #include <funcoes.h>
 
 hw_timer_t *timer = NULL;
-const int http_port = 433;
+const int http_port = 443;
 String key = "tPmAAWT5Ab3j7F9b";
 String httpRequestData;
 String serverName;
 String serverPath;
 String payload;
 bool enviouTudo;
+bool liberado = true;
 uint32_t lastTimeConnected = 0;
 int httpResponseCode;
 int num_fails;
@@ -33,42 +34,44 @@ IPAddress serverLocal(10, 0, 0, 109);
 //led 17, 18, 19
 
 void configureButtons(){
-
     //Botao START/STOP
     botaoStartStop.pin_botao = 15;
     botaoStartStop.pin_led = 17;
+    botaoStartStop.id = 1;
     pinMode(botaoStartStop.pin_botao, INPUT);
     pinMode(botaoStartStop.pin_led, OUTPUT);
     botaoStartStop.estado_atual = digitalRead(botaoStartStop.pin_botao);
     botaoStartStop.ultimo_estado = botaoStartStop.estado_atual;
     botaoStartStop.parado = false;
     botaoStartStop.solicitouAcesso = false;
-    botaoStartStop.liberado = true;
-    botaoStartStop.temDados = false;
+    botaoStartStop.possuiDados = false;
+    botaoStartStop.tipo_parada = "START/STOP";
 
     //Botao SETUP
     botaoSetup.pin_botao = 4;
     botaoSetup.pin_led = 18;
+    botaoSetup.id = 2;
     pinMode(botaoSetup.pin_botao, INPUT);
     pinMode(botaoSetup.pin_led, OUTPUT);
     botaoSetup.estado_atual = digitalRead(botaoSetup.pin_botao);
     botaoSetup.ultimo_estado = botaoSetup.estado_atual;
     botaoSetup.parado = false;
     botaoSetup.solicitouAcesso = false;
-    botaoSetup.liberado = true;
-    botaoSetup.temDados = false;
+    botaoSetup.possuiDados = false;
+    botaoSetup.tipo_parada = "SETUP";
 
     //Botao Manuteção
     botaoManutecao.pin_botao = 16;
     botaoManutecao.pin_led = 19;
+    botaoManutecao.id = 3;
     pinMode(botaoManutecao.pin_botao, INPUT);
     pinMode(botaoManutecao.pin_led, OUTPUT);
     botaoManutecao.estado_atual = digitalRead(botaoManutecao.pin_botao);
     botaoManutecao.ultimo_estado = botaoManutecao.estado_atual;
     botaoManutecao.parado = false;
     botaoManutecao.solicitouAcesso = false;
-    botaoManutecao.liberado = true;
-    botaoManutecao.temDados = false;
+    botaoManutecao.possuiDados = false;
+    botaoManutecao.tipo_parada = "MANUTENCAO";
 }
 
 void configureWatchDog(){
@@ -94,9 +97,17 @@ void connectWiFi(){
   Serial.println(WiFi.localIP());
 }
 
-bool enviaDadosPOST(String dip, String hip, String dfp, String hfp){
+bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id){
+  String tipo;
   if (!isConnectedServer())
     return false;
+
+  if(id == 1)
+    tipo = botaoStartStop.tipo_parada;
+  else if(id == 2)
+    tipo = botaoSetup.tipo_parada;
+  else if(id == 3)
+    tipo = botaoManutecao.tipo_parada;
 
   Serial.println("####################################################################");
   Serial.println("Dados a ser enviado: ");
@@ -104,13 +115,14 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp){
   Serial.println("Hora inicio: " + hip);
   Serial.println("Data fim:   " + dfp);
   Serial.println("Hora fim:   " + hfp);
+  Serial.println("TIPO: " + tipo);
   Serial.println("####################################################################");
 
   Serial.println(serverName);
   http.begin(client, serverName);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded"); 
   httpRequestData = "key=" + key + "&data_inicio_parada=" + dip + "&hora_inicio_parada=" + hip +
-          "&data_fim_parada=" + dfp + "&hora_fim_parada=" + hfp; //Parâmetros com as leituras
+          "&data_fim_parada=" + dfp + "&hora_fim_parada=" + hfp + "&tipo=" + tipo;
   httpResponseCode = http.POST(httpRequestData);
 
   Serial.print("HTTP Response code: ");
@@ -258,7 +270,15 @@ void soft_RESET(){ //IRAM_ATTR faz a funçao ser chamada mais rapido. joga na RA
   ESP.restart();
 }
 
-void verificaBotao(Botao *botao, String tipo){
+bool solicitaramAcesso(){
+  return botaoStartStop.solicitouAcesso || botaoSetup.solicitouAcesso || botaoManutecao.solicitouAcesso;
+}
+
+bool possuemDados(){
+    return botaoStartStop.possuiDados || botaoSetup.possuiDados || botaoManutecao.possuiDados;
+}
+
+void verificaBotao(Botao *botao){
   botao->estado_atual = !digitalRead(botao->pin_botao);
   
   if(botao->estado_atual != botao->ultimo_estado){  
@@ -268,7 +288,7 @@ void verificaBotao(Botao *botao, String tipo){
         Serial.println("=========================================");
         Serial.println("MAQUINA PARADA!");
         botao->parado = true;
-        Serial.println("TIPO: " + tipo);
+        Serial.println("TIPO: " + botao->tipo_parada);
         botao->parado = true;
         digitalWrite(botao->pin_led, HIGH);
         botao->data_inicio_parada = getData();
@@ -279,7 +299,7 @@ void verificaBotao(Botao *botao, String tipo){
       }else{
         Serial.println("=========================================");
         Serial.println("MAQUINA RETORMADA!");
-        Serial.println("TIPO: " + tipo);
+        Serial.println("TIPO: " + botao->tipo_parada);
         Serial.println("RELATORIO:");
         botao->parado = false;
         digitalWrite(botao->pin_led, LOW);
@@ -290,6 +310,27 @@ void verificaBotao(Botao *botao, String tipo){
         Serial.println("Data fim:   " + botao->data_fim_parada);
         Serial.println("Hora fim:   " + botao->hora_fim_parada);
         Serial.println("=========================================");
+        dados = botao->data_inicio_parada + "," + botao->hora_inicio_parada + "," + botao->data_fim_parada + "," + botao->hora_fim_parada + "," + String(botao->id);
+        Serial.println("Dados a serem gravados: " + dados);
+        botao->solicitouAcesso = true;
+        Serial.print("Aguardando");
+        while (!liberado){
+          Serial.print(".");
+          delay(50);
+        }
+        Serial.println("");
+        liberado = false;
+        while (!ObjFS.writeFile(dados, &errorMsg)){
+          Serial.println(errorMsg);
+          delay(50);
+        }
+        Serial.println("Dados gravado com sucesso!");
+        botao->solicitouAcesso = false;
+        liberado = true;
+        botao->possuiDados = true;
+
+        if (millis() > LIMIT)
+          soft_RESET();        
       }
     }
     delay(75);

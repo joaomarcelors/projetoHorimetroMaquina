@@ -14,9 +14,6 @@
 #define MAX_FAILED 3
 #define MAX_DISCONNECTED_TIME 10000
 #define LIMIT 4000000000
-#define STARTSTOP "START/STOP"
-#define SETUP "SETUP"
-#define MANUTENCAO "MANUTENÇÃO"
 
 extern hw_timer_t *timer;
 extern const int http_port;
@@ -26,6 +23,7 @@ extern String serverName;
 extern String serverPath;
 extern String payload;
 extern bool enviouTudo;
+extern bool liberado;
 extern uint32_t lastTimeConnected;
 extern int httpResponseCode;
 extern int num_fails;
@@ -37,6 +35,7 @@ extern String linha;
 typedef struct{
     byte pin_led;
     byte pin_botao;
+    byte id;
     String data_inicio_parada;
     String hora_inicio_parada;
     String data_fim_parada;
@@ -46,8 +45,7 @@ typedef struct{
     bool ultimo_estado;
     bool parado;
     bool solicitouAcesso;
-    bool liberado;
-    bool temDados;
+    bool possuiDados;
 }Botao;
 
 extern Botao botaoStartStop;
@@ -66,7 +64,7 @@ void checkWiFiConnection(void *p);
 void configureButtons();
 void configureWatchDog();
 void connectWiFi();
-bool enviaDadosPOST(String dip, String hip, String dfp, String hfp);
+bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id);
 String getData();
 String getHora();
 bool hasInternet();
@@ -76,6 +74,8 @@ void initNTP();
 void initSPPIFS();
 void showAllFiles();
 void soft_RESET();
-void verificaBotao(Botao *botao, String tipo);
+bool solicitaramAcesso();
+bool possuemDados();
+void verificaBotao(Botao *botao);
 
 #endif 
