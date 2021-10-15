@@ -118,7 +118,7 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp, int id){
   Serial.println("TIPO: " + tipo);
   Serial.println("####################################################################");
 
-  Serial.println(serverName);
+  //Serial.println(serverName);
   http.begin(client, serverName);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded"); 
   httpRequestData = "key=" + key + "&data_inicio_parada=" + dip + "&hora_inicio_parada=" + hip +
