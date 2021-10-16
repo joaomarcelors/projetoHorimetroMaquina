@@ -58,9 +58,9 @@ bool possuemDados(){
 void verificaBotao(Botao *botao){
   botao->estado_atual = !digitalRead(botao->pin_botao);
   
-  if(botao->estado_atual != botao->ultimo_estado){  
+  if(botao->estado_atual != botao->ultimo_estado || (botao->has_init_di && botao->has_init_hi)){   
     botao->ultimo_estado = botao->estado_atual;
-    if(botao->estado_atual == HIGH){
+    if(botao->estado_atual == HIGH || (botao->has_init_di && botao->has_init_hi)){
       if(!botao->ativado){
         Serial.println("=========================================");
         if(botao->id == 1) //operador da maquina
@@ -69,12 +69,18 @@ void verificaBotao(Botao *botao){
           Serial.println("MAQUINA PARADA!");
         botao->ativado = true;
         digitalWrite(botao->pin_led, HIGH);
-        botao->data_inicio = getData();
-        botao->hora_inicio = getHora();
+        if(!((botao->has_init_di && botao->has_init_hi))){
+          botao->data_inicio = getData();
+          botao->hora_inicio = getHora();
+        }
         Serial.println("TIPO: " + botao->tipo);
         Serial.println("Data: " + botao->data_inicio);
         Serial.println("Hora: " + botao->hora_inicio);
-        Serial.println("=========================================");       
+        Serial.println("========================================="); 
+        gravaPosNVS(botao->chave_di_nvs, botao->data_inicio);
+        gravaPosNVS(botao->chave_hi_nvs, botao->hora_inicio);   
+        botao->has_init_di = false;
+        botao->has_init_hi = false;   
       }else{
         Serial.println("=========================================");
         if(botao->id == 1)
@@ -92,6 +98,8 @@ void verificaBotao(Botao *botao){
         Serial.println("Data fim:   " + botao->data_fim);
         Serial.println("Hora fim:   " + botao->hora_fim);
         Serial.println("=========================================");
+        gravaPosNVS(botao->chave_di_nvs, "");//limpa data e hora inicio
+        gravaPosNVS(botao->chave_hi_nvs, "");
         dados = botao->data_inicio + "," + botao->hora_inicio + "," + botao->data_fim + "," + botao->hora_fim + "," + String(botao->id);
         Serial.println("Dados a serem gravados: " + dados);
         botao->solicitouAcesso = true;

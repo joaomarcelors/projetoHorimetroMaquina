@@ -56,8 +56,10 @@ void setup() {
   connectWiFi();
   initSPPIFS();
   initNTP();
-  
-  Serial.println("Data: " + getData() + " Hora: " + getHora());
+  verificaDadosNVS(&botaoStartStop);
+  verificaDadosNVS(&botaoSetup);
+  verificaDadosNVS(&botaoManutecao);
+  Serial.println("Nesse instante, Data: " + getData() + " Hora: " + getHora());
 }
 
 void loop() {

@@ -50,6 +50,8 @@ typedef struct{
     bool ativado;
     bool solicitouAcesso;
     bool possuiDados;
+    bool has_init_di;
+    bool has_init_hi;
 }Botao;
 
 extern Botao botaoStartStop;

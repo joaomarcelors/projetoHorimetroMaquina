@@ -113,19 +113,23 @@ void verificaDadosNVS(Botao *botao){
   if(str.equals("")){ //senao conseguir retorna ""
     botao->data_inicio = "";
     gravaPosNVS(botao->chave_di_nvs, "");
-    Serial.println("Data inicio: vazio");
+    Serial.println("Data inicio: ----/--/--");
+    botao->has_init_di = false;
   }else{
     botao->data_inicio = str;
     Serial.println("Data inicio: " + botao->data_inicio);
+    botao->has_init_di = true;
   }
   str = lerPosNVS(botao->chave_hi_nvs);
   if(str.equals("")){ //senao conseguir retorna ""
     botao->hora_inicio = "";
     gravaPosNVS(botao->chave_hi_nvs, "");
-    Serial.println("Hora inicio: vazio");
+    Serial.println("Hora inicio: --:--:--");
+    botao->has_init_hi = false;
   }else{
     botao->hora_inicio = str;
     Serial.println("Hora inicio: " + botao->hora_inicio);
+    botao->has_init_hi = true;
   }
   Serial.println("==============================");
 }
