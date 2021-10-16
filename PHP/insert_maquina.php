@@ -1,3 +1,4 @@
+//editado por batata
 <?php
     $hash = '$2y$10$6K3B6ZxM0iv7niLzd5HIFeOGIZahnkmeDknE3mzYahYQw58CNxkie';
 
