@@ -115,7 +115,7 @@ bool isDisconnectedForTooLong(){
 bool isConnectedServer(){
   bool conectado;
   conectado = client.connect(serverLocal, http_port, 3000);
-
+  
   if (conectado)
     Serial.println("Conectado com o servidor");
   else

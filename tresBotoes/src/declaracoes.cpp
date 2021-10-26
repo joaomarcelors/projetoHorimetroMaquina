@@ -25,7 +25,7 @@ Botao botaoSetup;
 Botao botaoManutecao;
 
 HTTPClient http;
-WiFiClient client;
+WiFiClientSecure client; //o pacote de dados vai criptografado
 WiFiUDP udp;
 NTPClient ntp(udp, "0.br.pool.ntp.org", -3 * 3600, 60000);
 FS_File_Record ObjFS("/dhif.bin", sizeOfRecord);

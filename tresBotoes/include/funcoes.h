@@ -58,7 +58,7 @@ extern Botao botaoStartStop;
 extern Botao botaoSetup;
 extern Botao botaoManutecao;
 extern HTTPClient http;
-extern WiFiClient client;
+extern WiFiClientSecure client;
 extern WiFiUDP udp;
 extern NTPClient ntp;
 extern FS_File_Record ObjFS;
