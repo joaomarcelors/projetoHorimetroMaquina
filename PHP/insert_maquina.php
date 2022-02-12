@@ -29,13 +29,13 @@
     $sql = "INSERT INTO industria.$tabela (data_inicio, hora_inicio, data_fim, hora_fim, tipo) 
             VALUES ('$data_inicio', '$hora_incio', '$data_fim', '$hora_fim', '$tipo')";
 
-    //echo "$sql<br/>";
     if (!$conn->query($sql)) {
+        $conn->close();
         die("Erro ao executar query no banco de dados...");
     }else{
+        $conn->close();
         die("OK");
     }
-    $conn->close();
 ?>
 
 

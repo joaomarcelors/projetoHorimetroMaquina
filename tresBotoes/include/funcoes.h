@@ -9,8 +9,8 @@
 #include <FS_File_Record.h>
 #include "nvs_flash.h" 
 
-#define SSID "trem"
-#define PASSWORD "ze127naide"
+#define SSID "MICROTELL-105770"
+#define PASSWORD "ana3680joao"
 #define host_google "www.google.com"
 #define MAX_FAILED 3
 #define MAX_DISCONNECTED_TIME 10000
@@ -58,7 +58,7 @@ extern Botao botaoStartStop;
 extern Botao botaoSetup;
 extern Botao botaoManutecao;
 extern HTTPClient http;
-extern WiFiClientSecure client;
+extern WiFiClient client;
 extern WiFiUDP udp;
 extern NTPClient ntp;
 extern FS_File_Record ObjFS;

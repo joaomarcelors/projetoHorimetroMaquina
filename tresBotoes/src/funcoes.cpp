@@ -120,7 +120,8 @@ bool isConnectedServer(){
     Serial.println("Conectado com o servidor");
   else
     Serial.println("Falha na conexao com o servidor");
-
+  Serial.println(serverName);
+  Serial.println(hasInternet());
   client.stop();
   return conectado;
 }
