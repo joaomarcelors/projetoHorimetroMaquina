@@ -14,7 +14,7 @@
 #define MAX_FAILED 3
 #define MAX_DISCONNECTED_TIME 10000
 
-hw_timer_t *timer = NULL; // faz o controle do controlador
+hw_timer_t *timer = NULL; //faz o controle do controlador
 // Site remoto - Coloque aqui os dados do site que vai receber a requisição GET
 const int http_port = 443;
 String key = "tPmAAWT5Ab3j7F9b";
@@ -38,8 +38,8 @@ uint32_t lastTimeConnected = 0;
 int httpResponseCode;
 int num_fails;
 const uint32_t LIMIT = 4000000000;
-// 2021-09-29;17:10:58;2021-09-29;17:11:01
-//  Tamanho dos registros
+//2021-09-29;17:10:58;2021-09-29;17:11:01
+// Tamanho dos registros
 const int sizeOfRecord = 39;
 // String que recebe as mensagens de erro
 String errorMsg;
@@ -53,7 +53,7 @@ WiFiUDP udp;
 NTPClient ntp(udp, "0.br.pool.ntp.org", -3 * 3600, 60000);
 // Objeto da nossa lib que recebe o nome do arquivo e tamanho fixo de registro
 FS_File_Record ObjFS("/dhif.bin", sizeOfRecord);
-// IPAddress serverLocal(192, 168, 3, 107);
+//IPAddress serverLocal(192, 168, 3, 107);
 IPAddress serverLocal(10, 0, 0, 109);
 
 void adicionaDadosFila(void *p);
@@ -72,17 +72,15 @@ void initSPPIFS();
 void showAllFiles();
 void soft_RESET();
 
-void setup()
-{
+void setup(){
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.println("Iniciando...");
-  serverName = "http://" + serverLocal.toString() + ":" + String(http_port) + "/maquina/insert_maquina.php";
+  serverName = "http://" + serverLocal.toString() + ":" + String(http_port)+ "/maquina/insert_maquina.php";
   pinMode(led, OUTPUT);
   pinMode(botao, INPUT);
 
-  for (int i = 0; i < 5; i++)
-  {
+  for (int i = 0; i < 5; i++){
     digitalWrite(led, HIGH);
     delay(100);
     digitalWrite(led, LOW);
@@ -127,24 +125,21 @@ void setup()
   connectWiFi();
   initSPPIFS();
   initNTP();
-
+  
   Serial.println("Data: " + getData() + " Hora: " + getHora());
   ultimo_estado = !digitalRead(botao);
 }
-// sem pressed é 1, pressed é 0 sem a negaçao
+//sem pressed é 1, pressed é 0 sem a negaçao
 void loop()
 {
   timerWrite(timer, 0);
   estado_atual = !digitalRead(botao);
 
-  if (estado_atual != ultimo_estado)
-  {
+  if (estado_atual != ultimo_estado){
     ultimo_estado = estado_atual;
-    if (estado_atual == 1)
-    {
+    if (estado_atual == 1){
       Serial.println("tem internet? " + String(!isDisconnectedForTooLong()));
-      if (!parado)
-      {
+      if (!parado){
         Serial.println("=========================================");
         Serial.println("MAQUINA PARADA!");
         parado = true;
@@ -155,8 +150,7 @@ void loop()
         Serial.println("Hora: " + hora_inicio_parada);
         Serial.println("=========================================");
       }
-      else
-      {
+      else{
         Serial.println("=========================================");
         Serial.println("MAQUINA RETORMADA!");
         Serial.println("RELATORIO:");
@@ -173,15 +167,13 @@ void loop()
         Serial.println("Dados a serem gravados: " + dados);
         solicitouAcesso = true;
         Serial.print("Aguardando");
-        while (!liberado)
-        {
+        while (!liberado){
           Serial.print(".");
           delay(50);
         }
         Serial.println("");
         liberado = false;
-        while (!ObjFS.writeFile(dados, &errorMsg))
-        {
+        while (!ObjFS.writeFile(dados, &errorMsg)){
           Serial.println(errorMsg);
           delay(50);
         }
@@ -201,54 +193,43 @@ void loop()
 void adicionaDadosFila(void *p)
 {
   TickType_t taskDelay = 2000 / portTICK_PERIOD_MS;
-  while (true)
-  {
-    if (WiFi.status() == WL_CONNECTED && temDados)
-    {
-      if (isConnectedServer())
-      {
-        if (!solicitouAcesso)
-        {
+  while (true){
+    if(WiFi.status() == WL_CONNECTED && temDados){
+      if (isConnectedServer()){
+        if (!solicitouAcesso){
           liberado = false;
-          // strcpy(dados_txt, "");
+          //strcpy(dados_txt, "");
           Serial.println("task usando o SPPIFS");
           Serial.println("Enviando dados para o banco de dados");
           linha = "";
           errorMsg = "0";
           ObjFS.rewind();
           // Exibe todos os registros até o fim
-          while (ObjFS.readFileNextRecord(&linha, &errorMsg) && linha != "")
-          {
+          while (ObjFS.readFileNextRecord(&linha, &errorMsg) && linha != ""){
             Serial.println(linha);
             enviouTudo = enviaDadosPOST(linha.substring(0, 10), linha.substring(11, 19), linha.substring(20, 30), linha.substring(31, 39));
-            if (!enviouTudo)
+            if(!enviouTudo)
               break;
           }
-          if (enviouTudo)
-          {
+          if(enviouTudo){
             Serial.println("Todos os dados foram enviados!");
-            if (ObjFS.destroyFile())
-            {
+            if (ObjFS.destroyFile()){
               Serial.println("Arquivo Apagado");
             }
             else
               Serial.println("Falha ao apagar arquivo!");
             temDados = false;
-          }
-          else
-          {
+          }else{
             temDados = true;
           }
-
+          
           liberado = true;
         }
-        else
-        {
+        else{
           Serial.println("Solicitaram acesso!");
         }
       }
-      else
-      {
+      else{
         Serial.println("Dados na fila:");
         showAllFiles();
       }
@@ -261,10 +242,8 @@ void checkInternet(void *p)
 {
   TickType_t taskDelay = 5000 / portTICK_PERIOD_MS;
 
-  while (true)
-  {
-    if (hasInternet())
-    {
+  while (true){
+    if (hasInternet()){
       lastTimeConnected = millis();
     }
 
@@ -272,38 +251,32 @@ void checkInternet(void *p)
   }
 }
 
-void checkWiFiConnection(void *p)
-{
+void checkWiFiConnection(void *p){
 
   TickType_t taskDelay = 1000 / portTICK_PERIOD_MS;
 
-  while (true)
-  {
-    if (WiFi.status() != WL_CONNECTED)
-    {
+  while (true){
+    if (WiFi.status() != WL_CONNECTED){
       connectWiFi();
     }
     vTaskDelay(taskDelay);
   }
 }
 
-void configureWatchDog()
-{
+void configureWatchDog(){
   timer = timerBegin(0, 80, true);
-  timerAttachInterrupt(timer, &soft_RESET, true); // calback
-  timerAlarmWrite(timer, 10000000, true);         // 10s
-  timerAlarmEnable(timer);                        // habilita a interrupiçao
+  timerAttachInterrupt(timer, &soft_RESET, true); //calback
+  timerAlarmWrite(timer, 10000000, true);         //10s
+  timerAlarmEnable(timer);                        //habilita a interrupiçao
 }
 
-void connectWiFi()
-{
+void connectWiFi(){
   Serial.print("Connecting to ");
   Serial.print(SSID);
 
   WiFi.begin(SSID, PASSWORD);
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED){
     delay(1000);
     Serial.print(".");
   }
@@ -313,8 +286,7 @@ void connectWiFi()
   Serial.println(WiFi.localIP());
 }
 
-bool enviaDadosPOST(String dip, String hip, String dfp, String hfp)
-{
+bool enviaDadosPOST(String dip, String hip, String dfp, String hfp){
   if (!isConnectedServer())
     return false;
 
@@ -328,31 +300,25 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp)
 
   Serial.println(serverName);
   http.begin(client, serverName);
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded"); 
   httpRequestData = "key=" + key + "&data_inicio_parada=" + dip + "&hora_inicio_parada=" + hip +
-                    "&data_fim_parada=" + dfp + "&hora_fim_parada=" + hfp; // Parâmetros com as leituras
+          "&data_fim_parada=" + dfp + "&hora_fim_parada=" + hfp; //Parâmetros com as leituras
   httpResponseCode = http.POST(httpRequestData);
 
   Serial.print("HTTP Response code: ");
   Serial.println(httpResponseCode);
 
-  if (httpResponseCode == 200)
-  {
+  if(httpResponseCode == 200){
     payload = http.getString();
     Serial.println("Payload: " + payload);
-    if (payload.equals("OK"))
-    {
+    if(payload.equals("OK")){
       Serial.println("DADOS ENVIADO COM SUCESSO AO BANCO DE DADOS!");
       http.end();
       return true;
     }
-  }
-  else if (httpResponseCode == 404)
-  {
+  }else if(httpResponseCode == 404){
     Serial.println("PAGINA NAO ENCONTRADA!");
-  }
-  else
-  {
+  }else{
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
@@ -361,52 +327,45 @@ bool enviaDadosPOST(String dip, String hip, String dfp, String hfp)
   return false;
 }
 
-String getData()
-{
-  if (!isDisconnectedForTooLong())
-  {
+String getData(){
+  if (!isDisconnectedForTooLong()){
     if (!ntp.update())
       initNTP();
   }
   return ntp.getFormattedDate();
 }
 
-String getHora()
-{
-  if (!isDisconnectedForTooLong())
-  {
+String getHora(){
+  if (!isDisconnectedForTooLong()){
     if (!ntp.update())
       initNTP();
   }
   return ntp.getFormattedTime();
 }
 
-bool hasInternet()
-{
+bool hasInternet(){
   WiFiClient client;
-  // Endreço IP do Google 172.217.3.110
+  //Endreço IP do Google 172.217.3.110
   IPAddress adr;
-  // Tempo limite para conexão
+  //Tempo limite para conexão
   WiFi.hostByName(host_google, adr);
   client.setTimeout(5);
   Serial.print("IP server google: ");
   Serial.println(adr);
-  // Tenta conectar
+  //Tenta conectar
   bool connected = client.connect(adr, http_port);
-  // Fecha a conexão
+  //Fecha a conexão
   client.stop();
-  // Retorna true se está conectado ou false se está desconectado
+  //Retorna true se está conectado ou false se está desconectado
   return connected;
 }
 
-bool isDisconnectedForTooLong()
-{
-  // Retorna true se o tempo desde a última conexão for maior que o definido
+bool isDisconnectedForTooLong(){
+  //Retorna true se o tempo desde a última conexão for maior que o definido
   return millis() - lastTimeConnected > MAX_DISCONNECTED_TIME;
 }
 
-bool isConnectedServer()
-{
+bool isConnectedServer(){
   bool conectado;
   conectado = client.connect(serverLocal, http_port, 3000);
 
@@ -419,15 +378,13 @@ bool isConnectedServer()
   return conectado;
 }
 
-void initNTP()
-{
-  // Inicializa o client NTP
+void initNTP(){
+  //Inicializa o client NTP
   ntp.begin();
 
-  // Espera pelo primeiro update online
+  //Espera pelo primeiro update online
   Serial.println("Update do relogio");
-  if (!ntp.update())
-  {
+  if (!ntp.update()){
     Serial.println("NTP");
     Serial.print(".");
     if (ntp.forceUpdate())
@@ -439,15 +396,12 @@ void initNTP()
     Serial.println("Update OK");
 }
 
-void initSPPIFS()
-{
+void initSPPIFS(){
   num_fails = 1;
-  while (!ObjFS.init())
-  {
+  while (!ObjFS.init()){
     Serial.println("Falha ao iniciar SPPIFS..." + String(num_fails) + "a tentativa...");
     delay(100);
-    if (num_fails == MAX_FAILED)
-    {
+    if (num_fails == MAX_FAILED){
       Serial.println("Falha ao iniciar SPPIFS");
       soft_RESET();
     }
@@ -455,19 +409,15 @@ void initSPPIFS()
   }
   Serial.println("Inicialização da SPPIFS concluída!");
   // Se o arquivo não existe, criamos o arquivo
-  if (!ObjFS.fileExists())
-  {
+  if (!ObjFS.fileExists()){
     Serial.println("Criando novo aquivo...");
     ObjFS.newFile(); // Cria o arquivo
-  }
-  else
-  {
+  }else{
     Serial.println("Abrindo aquivo existente...");
   }
 }
 
-void showAllFiles()
-{
+void showAllFiles(){
   int count = 0;
   String linha = "";
 
@@ -479,16 +429,14 @@ void showAllFiles()
   ObjFS.rewind();
 
   // Exibe todos os registros até o fim
-  while (ObjFS.readFileNextRecord(&linha, &errorMsg) && linha != "")
-  {
+  while (ObjFS.readFileNextRecord(&linha, &errorMsg) && linha != ""){
     Serial.print(String(count) + " - ");
     Serial.println(linha);
     count++;
   }
 
   // Se existir mensagem de erro exibe na serial e no display
-  if (errorMsg != "")
-  {
+  if (errorMsg != ""){
     Serial.println(errorMsg);
   }
 
@@ -496,8 +444,7 @@ void showAllFiles()
   Serial.println("# End of file #");
 }
 
-void soft_RESET()
-{ // IRAM_ATTR faz a funçao ser chamada mais rapido. joga na RAM
+void soft_RESET(){ //IRAM_ATTR faz a funçao ser chamada mais rapido. joga na RAM
   Serial.println("Reiniciano o sistema...");
   delay(1000);
   ESP.restart();
